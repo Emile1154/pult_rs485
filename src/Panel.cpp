@@ -32,10 +32,9 @@ Panel::~Panel()
 
 void Panel::query(){
     if(millis() - timer >= 120){
-        const CommandInterface * command = queue.pop();
-        if(command != nullptr){
-            command->execute();   
-            command = nullptr;
+        if(!queue.isEmpty()){
+            uint8_t num_key = queue.pop();
+            carotage.execute(num_key);
         }
         timer = millis();
     }
@@ -87,32 +86,32 @@ void Panel::checkKeyboard(){
     static uint32_t btnTimer2;
     static bool _click;
     if(!(PINC & (1 << UP)) && !changed){
-        queue.push(upCommand);
+        queue.push(1); //up
         changed = true;            // forbidding flag
         PORTC |= (1 << LED_UP);
     }
     else if(!(PINC & (1 << DOWN)) && !changed){
-        queue.push(downCommand);
+        queue.push(2);//down
         changed = true;             // forbidding flag
         PORTC |= (1 << LED_DOWN);
     }
     else if(!(PINB & (1 << LEFT)) && !click && millis() - btnTimer > 70){
-        queue.push(leftCommand);
+        queue.push(3);//left
         btnTimer = millis();
         click = true;
     } 
     else if(!(PIND & (1 << RIGHT)) && !click && millis() - btnTimer > 70){
-        queue.push(rightCommand); 
+        queue.push(4); //right
         btnTimer = millis();
         click = true;
     }
     else if(click && (PIND & (1 << RIGHT)) && (PINB & (1 << LEFT)) && millis() - btnTimer > 70){ 
-        queue.push(layerStopCommand);
+        queue.push(5);//layer stop
         btnTimer = millis();
         click = false;
     }
     else if( (!(PIND & (1 << STOP)) && !_click && millis() - btnTimer2 > 100) || !(PIND & (1 << OVERLOAD)) ){
-        queue.push(stopCommand);
+        queue.push(6);//stop
         PORTC &= ~(1 << LED_UP);
         PORTC &= ~(1 << LED_DOWN);
         btnTimer2 = millis();
@@ -148,11 +147,11 @@ void Panel::checkPots(){
     if(layer_value <= 0) { layer_value = 0;}
     if(millis() - wait >= 40){
         if(abs(reel_value - old_reel_value) > DELTA){  // if values from potentiometr reel changed refresh freqency on slave devices
-            queue.push(reelSetSpeedCommand);
+            queue.push(7);
             old_reel_value = Panel::reel_value;
         } 
         if(abs(layer_value - old_layer_value) > DELTA){  // if values from potentiometr layer changed refresh freqency on slave devices
-            queue.push(layerSetSpeedCommand);
+            queue.push(8);
             old_layer_value = Panel::layer_value;
         }
         wait = millis();
