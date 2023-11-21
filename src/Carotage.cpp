@@ -1,42 +1,32 @@
 #include <Carotage.h>
 
-Carotage::Carotage(const ModbusRTU& modbus) : modbus(modbus){
-
+Carotage::execute(uint8_t num_key){
+    switch (num_key)
+    {
+    case 1:
+        modbus.up();
+        break;
+    case 2:
+        modbus.down();
+        break;
+    case 3:
+        modbus.left();
+        break;
+    case 4:
+        modbus.right();
+        break;
+    case 5:
+        modbus.stop();
+        break;
+    case 6:
+        modbus.layer_stop();
+        break;
+    case 7:
+        modbus.reel_set_speed();
+        break;
+    case 8:
+        modbus.layer_set_speed();
+        break;    
+    }
 }
 
-Carotage::~Carotage(){
-
-}
-
-void Carotage::up() const{
-    modbus.up();
-}
-
-void Carotage::down() const{
-    modbus.down();
-}
-
-void Carotage::left() const{
-    modbus.left();
-}
-
-void Carotage::right() const{
-    modbus.right();
-}
-
-void Carotage::stop() const{
-    modbus.stop();
-}
-
-void Carotage::layer_stop() const{
-    modbus.layerStop();
-}
-
-void Carotage::layer_set_speed() const{
-    modbus.layerSetSpeed();
-}
-
-void Carotage::reel_set_speed() const{
-    modbus.reelSetSpeed();
-}
-//next realisation

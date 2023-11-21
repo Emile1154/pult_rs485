@@ -27,15 +27,9 @@ int main(){
   initTimer();
   ModbusRTU modbus(9600, SERIAL_8O1, 100);
   Carotage carotage(modbus); //maybe add old values from EEPROM in constructor in future
-  Panel panel(
-    new UpCommand(carotage),
-    new DownCommand(carotage),
-    new LeftCommand(carotage),
-    new RightCommand(carotage),
-    new StopCommand(carotage),
-    new LayerStopCommand(carotage),
-    new ReelSetSpeedCommand(carotage),
-    new LayerSetSpeedCommand(carotage)
+  Panel panel(  
+      &carotage`  
+      //&modbus         
   );
   panel.initPins();
   panel.initADC();
