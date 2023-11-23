@@ -136,6 +136,8 @@ void Panel::checkPots(){
     static volatile uint16_t old_reel_value;
     static volatile uint16_t old_layer_value;
     static uint32_t wait;
+    uint16_t speed;
+    uint8_t hi_byte, lo_byte;
     uint16_t reel_pot = filter(ADC_REEL, 0);
     reel_value = map(reel_pot,140, 1023, 0, 5000);
     if(reel_value > 5000){reel_value = 5000;}
@@ -147,13 +149,34 @@ void Panel::checkPots(){
     if(layer_value <= 0) { layer_value = 0;}
     if(millis() - wait >= 40){
         if(abs(reel_value - old_reel_value) > DELTA){  // if values from potentiometr reel changed refresh freqency on slave devices
+            if(select == 0){ //update reel speed
+                speed = reel_value;
+                hi_byte = (speed >> 8) & 0xFF;
+                lo_byte =  speed & 0xFF;
+                REEL_SET_SPEED[4] = hi_byte;
+                REEL_SET_SPEED[5] = lo_byte;
+                return;
+            }
             queue.push(7);
-            old_reel_value = Panel::reel_value;
+            old_reel_value = reel_value;
         } 
         if(abs(layer_value - old_layer_value) > DELTA){  // if values from potentiometr layer changed refresh freqency on slave devices
+            speed = layer_value;
+            hi_byte = (speed >> 8) & 0xFF;
+            lo_byte =  speed & 0xFF;
+            if(select == 1){ //update layer speed
+                LAYER_SET_SPEED[4] = hi_byte;
+                LAYER_SET_SPEED[5] = lo_byte;
+            else if((!(PINB & (1 << LEFT)) && (!(PIND & (1 << RIGHT))))){
+                LAYER_STOP_SET_SPEED[9]  = hi_byte;
+                LAYER_STOP_SET_SPEED[10] = lo_byte;      
+            }
+        return;
             queue.push(8);
-            old_layer_value = Panel::layer_value;
+            old_layer_value = layer_value;
         }
+         return;
         wait = millis();
     }
+}
 }

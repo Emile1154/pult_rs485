@@ -14,8 +14,8 @@ private:
     uint16_t readADC(uint8_t _pin);
     
 public:
-    static uint16_t reel_value;
-    static uint16_t layer_value;
+    uint16_t reel_value;
+    uint16_t layer_value;
     void initPins(); 
     void initADC();
     void checkKeyboard();
