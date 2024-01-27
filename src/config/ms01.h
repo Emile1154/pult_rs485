@@ -1,9 +1,13 @@
+#pragma once
 #ifndef _MILLIS_H_
 #define _MILLIS_H_
-
 #include <stdint.h>
-volatile uint64_t t_millis;
+#include <util/atomic.h>
+#include <avr/interrupt.h>
+#include <avr/io.h>
+
 ISR(TIMER1_COMPA_vect);
 void initTimer();
-uint64_t millis();
+uint64_t get_ms();
+
 #endif

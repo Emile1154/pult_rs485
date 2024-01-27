@@ -2,22 +2,25 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
+#include <config/settings.h>
+
 class Queue {
 private:
-    static const int MAX_SIZE = 64; 
-    uint8_t data[MAX_SIZE]; 
+    uint8_t data[MAX_SIZE_QUEUE]; 
     int front; 
     int rear; 
 
 public:
-    Queue() : front(-1), rear(-1) {}
+    Queue() : front(-1), rear(-1) {
+        
+    }
 
     bool isEmpty() {
         return front == -1 && rear == -1;
     }
 
     bool isFull() {
-        return (rear + 1) % MAX_SIZE == front;
+        return (rear + 1) % MAX_SIZE_QUEUE == front;
     }
     void push(uint8_t value) {
         if (isFull()) {
@@ -27,7 +30,7 @@ public:
         if (isEmpty()) {
             front = rear = 0;
         } else {
-            rear = (rear + 1) % MAX_SIZE;
+            rear = (rear + 1) % MAX_SIZE_QUEUE;
         }
 
         data[rear] = value;
@@ -41,7 +44,7 @@ public:
             front = rear = -1;
             return poppedValue;
         } 
-        rear = (rear - 1 + MAX_SIZE) % MAX_SIZE;
+        rear = (rear - 1 + MAX_SIZE_QUEUE) % MAX_SIZE_QUEUE;
         return poppedValue;
     }
 };
