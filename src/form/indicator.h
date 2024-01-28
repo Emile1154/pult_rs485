@@ -2,6 +2,9 @@
 #ifndef _INDICATOR_H_
 #define _INDICATOR_H_
 
+#include <stdint.h>
+#include <config/settings.h>
+
 void init_indicator();
 
 /*
