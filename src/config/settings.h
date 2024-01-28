@@ -1,3 +1,10 @@
+#pragma once
+#ifndef _SETTINGS_H_
+#define _SETTINGS_H_
+
+#include <avr/io.h>
+
+#define DEBUG_ENABLED 1
 
 #define SPEED 9600                      // baudrate               
 #define INTERVAL 120                    // 12ms setup in CF
@@ -31,3 +38,4 @@
 #define ADC_REEL  21             // potentiometr pin for control speed on reel motor
 #define ADC_LAYER 20            // potentiometr pin for control speed on layer motor
 
+#endif
