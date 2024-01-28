@@ -2,9 +2,10 @@
 #ifndef _MODBUS_CONTROLLER_H_
 #define _MODBUS_CONTROLLER_H_
 
+
 #include <controller/panel_controller.h>
 #include <model/modbus_request.h>
-
+#include <stdint.h>
 
 extern "C" {
     #include <config/ms01.h>
