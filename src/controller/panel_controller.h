@@ -5,11 +5,11 @@
 #include <stdint.h>
 #include <config/settings.h>
 #include <model/queue.h>
-
-extern "C" {
 #if DEBUG_ENABLED
     #include <config/debug_cfg.h>
 #endif
+extern "C" {
+    #include <config/ms01.h>
     #include <config/adc_cfg.h>
 }
 
@@ -17,8 +17,8 @@ class PanelController {
 private:
     bool winch_running = false;
     bool click = false;
-    uint64_t btn_timer = 0;
-
+    uint64_t timer = 0;
+    bool mutex = 0;
     volatile uint16_t reel_pot_prev  = 0;
     volatile uint16_t layer_pot_prev = 0;
 
@@ -50,6 +50,12 @@ public:
     inline void init_panel(){
         init_port();
         init_adc();
+        init_timer();
+
+#if DEBUG_ENABLED
+        run_debug();
+        println(("UP pressed"));
+#endif
     }
 
     inline void read_keypad(){
@@ -57,7 +63,7 @@ public:
         if( ! (PINC & (1 << UP)) && ! winch_running ){
 
 #if DEBUG_ENABLED 
-            println(F("UP pressed"));
+            println(("UP pressed"));
 #endif
             winch_running = true;
         }
@@ -65,7 +71,7 @@ public:
         if( ! (PINC & (1 << DOWN)) && ! winch_running ){
 
 #if DEBUG_ENABLED
-            println(F("DOWN pressed"));
+            println(("DOWN pressed"));
 #endif
             winch_running = true;
         }
@@ -73,24 +79,24 @@ public:
         if( ! (PIND & (1 << STOP)) ){
 
 #if DEBUG_ENABLED
-            println(F("STOP pressed"));
+            println(("STOP pressed"));
 #endif
             winch_running = false;
         }
 
-        if( ! (PINB & (1 << LEFT)) ){
+        if( ! (PINB & (1 << LEFT)) && ! click ){
 
 #if DEBUG_ENABLED
-            println(F("LEFT pressed"));
+            println(("LEFT pressed"));
 #endif
 
             click = true;
 
         }
-        if( ! (PIND & (1 << RIGHT)) ){
+        if( ! (PIND & (1 << RIGHT)) && ! click ){
 
 #if DEBUG_ENABLED
-            println(F("RIGHT pressed"));
+            println(("RIGHT pressed"));
 #endif
 
             click = true;
@@ -100,13 +106,14 @@ public:
         if( (PINB & (1 << LEFT)) && (PIND & (1 << RIGHT)) && click ){
             if(winch_running){
 #if DEBUG_ENABLED
-            println(F("LEFT/RIGHT released & winch is run"));
+            println(("LEFT/RIGHT released & winch is run"));
 #endif                 
             }else{
 #if DEBUG_ENABLED
-            println(F("LEFT/RIGHT released"));
+            println(("LEFT/RIGHT released"));
 #endif      
             }
+            click = false;
         }
 
 
@@ -115,7 +122,17 @@ public:
     }
 
     inline void read_potentiometer(){
-        
+        if( get_ms() - timer >= 10000){
+            uint16_t Layer = adc_read(1);
+            uint16_t reel = adc_read(0);
+#if DEBUG_ENABLED
+            print(("Layer " ));
+            println((Layer));
+            print(("reel " ));
+            println((reel));
+#endif 
+            timer = get_ms();
+        }
     }
 };
 
