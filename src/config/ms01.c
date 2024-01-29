@@ -6,7 +6,7 @@ ISR(TIMER1_COMPA_vect){
     t_timer++;
 }
 
-void initTimer(void){
+void init_timer(void){
     TCCR1A = 0; // Set Timer1 control registers to 0
     TCCR1B = 0;
     TIMSK1 |= (1 << OCIE1A); //enable compare 

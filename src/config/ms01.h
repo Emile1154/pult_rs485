@@ -7,7 +7,7 @@
 #include <avr/io.h>
 
 ISR(TIMER1_COMPA_vect);
-void initTimer();
+void init_timer();
 uint64_t get_ms();
 
 #endif
