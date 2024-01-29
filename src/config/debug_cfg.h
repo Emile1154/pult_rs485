@@ -8,7 +8,7 @@
 SoftwareSerial debug(8,10);
 
 void run_debug() {
-    debug.begin(9600);    
+    debug.begin(9600);   //SERIAL 8 1 NONE 
 }
 
 void println(const char * str) {
@@ -19,11 +19,11 @@ void print(const char * str) {
     debug.print(str);
 }
 
-void print(uint8_t val) {
+void print(uint32_t val) {
     debug.print(val);
 }
 
-void println(uint16_t val) {
+void println(uint32_t val) {
     debug.println(val);
 }
 
