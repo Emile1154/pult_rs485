@@ -8,7 +8,7 @@
 #include <stdint.h>
 
 extern "C" {
-    #include <config/ms01.h>
+    
     #include <form/indicator.h>
 }
 
