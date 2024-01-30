@@ -1,8 +1,8 @@
 #include <config/adc_cfg.h>
 
-static uint16_t adc_filter(){
+// static uint16_t adc_filter(){
 
-}
+// }
 
 void init_adc(){
     ADCSRA |= ( 1 << ADEN );
@@ -26,5 +26,10 @@ uint16_t adc_read(uint8_t channel){
         while(ADCSRA & (1 << ADSC));
         mid_ADS =  mid_ADS + ADC;
     }
-    return (uint16_t)(mid_ADS/100.0);
+    mid_ADS = mid_ADS/100;
+    mid_ADS = mid_ADS*5;
+    if( mid_ADS > 5000 ){
+        mid_ADS = 5000;
+    }
+    return (uint16_t)(mid_ADS);
 }
