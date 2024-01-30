@@ -3,12 +3,11 @@
 
 
 int main() {
-    PanelController panel;
-    ModbusController modbus;
+    ModbusController panel;
     panel.init_panel();
+    panel.init_modbus();
     while(1){
-    panel.read_keypad();
-    panel.read_potentiometer();
-   // modbus.init_modbus();
-}
+        panel.read_keypad();
+        panel.read_potentiometer();
+    }
 }
