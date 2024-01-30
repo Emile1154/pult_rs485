@@ -5,12 +5,14 @@
 #include <stdint.h>
 #include <config/settings.h>
 
+
 void init_indicator();
 
-/*
- @args: sel - 0 - stop, 1 - up, 2 - down
-*/
-void led_write(uint8_t sel);
+void up_btn_led_on();
+void down_btn_led_on();
+void led_off();
+
+void error_view();
 
 
 #endif
