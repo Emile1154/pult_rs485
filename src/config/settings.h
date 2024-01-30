@@ -38,4 +38,15 @@
 #define ADC_REEL  21             // potentiometr pin for control speed on reel motor
 #define ADC_LAYER 20            // potentiometr pin for control speed on layer motor
 
+#define STOP_ALL              0    
+#define START_ALL_CW          1 
+#define START_ALL_CWW         2
+#define LAYER_START_MAX_CW    3
+#define LAYER_START_MAX_CWW   4
+#define LAYER_STOP_SET_SPEED  5
+#define LAYER_SET_SPEED       6
+#define REEL_SET_SPEED        7
+
+#define MAX_REQUESTS 24
+
 #endif
