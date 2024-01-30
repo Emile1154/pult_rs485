@@ -17,12 +17,22 @@ extern "C" {
     #include <config/adc_cfg.h>
 }
 
+#define STOP_STATE  0
+/*REEL STATES*/
+#define UP_STATE    1
+#define DOWN_STATE  2
+
+/*LAYER STATES*/
+#define LEFT_STATE  1
+#define RIGHT_STATE 2
+
 class PanelController {
 private:
-    bool winch_running = false;
-    bool click = false;
+    uint8_t winch_running = STOP_STATE;
+    uint8_t layer_dir =     STOP_STATE;
+
     uint64_t timer = 0;
-    bool mutex = 0;
+
     volatile uint16_t reel_pot_prev  = 0;
     volatile uint16_t layer_pot_prev = 0;
 
@@ -56,29 +66,24 @@ public:
         init_port();
         init_adc();
         init_timer();
-
-#if DEBUG_ENABLED
-        run_debug();
-        println(("UP pressed"));
-#endif
     }
 
     inline void read_keypad(){
         //if button UP is pressed
-        if( ! (PINC & (1 << UP)) && ! winch_running ){
+        if( ! (PINC & (1 << UP)) &&  winch_running == STOP_STATE ){
             queue.push(START_ALL_CW);
 #if DEBUG_ENABLED 
             println(("UP pressed"));
 #endif
-            winch_running = true;
+            winch_running = UP_STATE;
         }
         //if button DOWN is pressed
-        if( ! (PINC & (1 << DOWN)) && ! winch_running ){
-            queue.push(START_ALL_CWW);
+        if( ! (PINC & (1 << DOWN)) && winch_running == STOP_STATE ){
+            queue.push(START_ALL_CCW);
 #if DEBUG_ENABLED
             println(("DOWN pressed"));
 #endif
-            winch_running = true;
+            winch_running = DOWN_STATE;
         }
         //if button STOP is pressed
         if( ! (PIND & (1 << STOP)) ){
@@ -86,39 +91,51 @@ public:
 #if DEBUG_ENABLED
             println(("STOP pressed"));
 #endif
-            winch_running = false;
+            winch_running = STOP_STATE;
         }
 
-        if( ! (PINB & (1 << LEFT)) && ! click ){
-            queue.push(LAYER_START_MAX_CW);
+        if( ! (PINB & (1 << LEFT)) && layer_dir == STOP_STATE ){
+            queue.push(LAYER_START_MAX_CCW);
 #if DEBUG_ENABLED
             println(("LEFT pressed"));
 #endif
 
-            click = true;
+            layer_dir = LEFT_STATE;
 
         }
-        if( ! (PIND & (1 << RIGHT)) && ! click ){
-            queue.push(LAYER_START_MAX_CWW);
+        if( ! (PIND & (1 << RIGHT)) && layer_dir == STOP_STATE ){
+            queue.push(LAYER_START_MAX_CW);
 #if DEBUG_ENABLED
             println(("RIGHT pressed"));
 #endif
-
-            click = true;
+            layer_dir = RIGHT_STATE;
         }
 
         //if btn LEFT and RIGHT released
-        if( (PINB & (1 << LEFT)) && (PIND & (1 << RIGHT)) && click ){
-            if(winch_running){
+        if( (PINB & (1 << LEFT)) && (PIND & (1 << RIGHT)) && layer_dir ){
+            if(winch_running == UP_STATE){
+                if(layer_dir == RIGHT_STATE){
+                    //only set speed cmd
+
+                }else{
+                    // set speed cmd and reverse cmd
+                }
+                queue.push(LAYER_STOP_SET_SPEED);
 #if DEBUG_ENABLED
-            println(("LEFT/RIGHT released & winch is run"));
+                println(("LEFT/RIGHT released & winch is run"));
 #endif                 
-            }else{
+            }
+            if(winch_running == DOWN_STATE){
+                if(layer_dir == LEFT_STATE){
+                    // only set speed cmd
+                }else{
+                    //set speed cmd and reverse cmd
+                }
 #if DEBUG_ENABLED
-            println(("LEFT/RIGHT released"));
+                println(("LEFT/RIGHT released"));
 #endif      
             }
-            click = false;
+            layer_dir = STOP_STATE;
         }
     }
 
@@ -127,12 +144,12 @@ public:
             uint16_t reel_value = adc_read(0);
             uint16_t layer_value = adc_read(1) + K*reel_value;
             if(abs(reel_value - reel_pot_prev) > DELTA){  // if values from potentiometr reel changed refresh freqency on slave devices
-                requests.set_value( reel_value, 0 )
+                requests[REEL_SET_SPEED]->set_value( reel_value, 0 );
                 queue.push(REEL_SET_SPEED);
                 reel_pot_prev = reel_value;
             } 
             if(abs(layer_value - layer_pot_prev) > DELTA){  // if values from potentiometr layer changed refresh freqency on slave devices
-                requests.set_value( layer_value, 0 )
+                requests[LAYER_SET_SPEED]->set_value( layer_value, 0 );
                 queue.push(LAYER_SET_SPEED);
                 layer_pot_prev = layer_value;
             }
