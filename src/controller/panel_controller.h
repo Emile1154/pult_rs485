@@ -2,9 +2,13 @@
 #ifndef _PANEL_CONTROLLER_H_
 #define _PANEL_CONTROLLER_H_
 
+
 #include <stdint.h>
-#include <config/settings.h>
 #include <model/queue.h>
+#include <config/settings.h>
+#include <model/modbus_request.h>
+
+
 #if DEBUG_ENABLED
     #include <config/debug_cfg.h>
 #endif
@@ -46,6 +50,7 @@ private:
 
 protected:
     Queue queue;
+    request_modbus_pack_t * requests[MAX_REQUESTS];
 public:
     inline void init_panel(){
         init_port();
@@ -61,7 +66,7 @@ public:
     inline void read_keypad(){
         //if button UP is pressed
         if( ! (PINC & (1 << UP)) && ! winch_running ){
-
+            queue.push(START_ALL_CW);
 #if DEBUG_ENABLED 
             println(("UP pressed"));
 #endif
@@ -69,7 +74,7 @@ public:
         }
         //if button DOWN is pressed
         if( ! (PINC & (1 << DOWN)) && ! winch_running ){
-
+            queue.push(START_ALL_CWW);
 #if DEBUG_ENABLED
             println(("DOWN pressed"));
 #endif
@@ -77,7 +82,7 @@ public:
         }
         //if button STOP is pressed
         if( ! (PIND & (1 << STOP)) ){
-
+            queue.push(STOP_ALL);
 #if DEBUG_ENABLED
             println(("STOP pressed"));
 #endif
@@ -85,7 +90,7 @@ public:
         }
 
         if( ! (PINB & (1 << LEFT)) && ! click ){
-
+            queue.push(LAYER_START_MAX_CW);
 #if DEBUG_ENABLED
             println(("LEFT pressed"));
 #endif
@@ -94,7 +99,7 @@ public:
 
         }
         if( ! (PIND & (1 << RIGHT)) && ! click ){
-
+            queue.push(LAYER_START_MAX_CWW);
 #if DEBUG_ENABLED
             println(("RIGHT pressed"));
 #endif
@@ -115,21 +120,27 @@ public:
             }
             click = false;
         }
-
-
-
-
     }
 
     inline void read_potentiometer(){
         if( get_ms() - timer >= 10000){
-            uint16_t Layer = adc_read(1);
-            uint16_t reel = adc_read(0);
+            uint16_t reel_value = adc_read(0);
+            uint16_t layer_value = adc_read(1) + K*reel_value;
+            if(abs(reel_value - reel_pot_prev) > DELTA){  // if values from potentiometr reel changed refresh freqency on slave devices
+                requests.set_value( reel_value, 0 )
+                queue.push(REEL_SET_SPEED);
+                reel_pot_prev = reel_value;
+            } 
+            if(abs(layer_value - layer_pot_prev) > DELTA){  // if values from potentiometr layer changed refresh freqency on slave devices
+                requests.set_value( layer_value, 0 )
+                queue.push(LAYER_SET_SPEED);
+                layer_pot_prev = layer_value;
+            }
 #if DEBUG_ENABLED
             print(("Layer " ));
-            println((Layer));
+            println((layer_value));
             print(("reel " ));
-            println((reel));
+            println((reel_value));
 #endif 
             timer = get_ms();
         }
