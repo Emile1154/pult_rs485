@@ -40,9 +40,9 @@
 
 #define STOP_ALL              0    
 #define START_ALL_CW          1 
-#define START_ALL_CWW         2
+#define START_ALL_CCW         2
 #define LAYER_START_MAX_CW    3
-#define LAYER_START_MAX_CWW   4
+#define LAYER_START_MAX_CCW   4
 #define LAYER_STOP_SET_SPEED  5
 #define LAYER_SET_SPEED       6
 #define REEL_SET_SPEED        7
