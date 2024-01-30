@@ -103,11 +103,12 @@ public:
             }
 
             request = requests[queue.pop()];
+            request->send();
         }
         if(state){
             //start reading
         }
-        if( (state && get_ms - timer >= TIMEOUT )|| readed){
+        if( (state && get_ms - timer >= TIMEOUT ) || readed){
             //stop reading
         }
     }
