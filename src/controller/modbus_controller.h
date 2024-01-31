@@ -130,6 +130,7 @@ public:
     inline void init_modbus(){
         init_requests();
         init_uart();
+        init_indicator();
     }          
 
     void modbus_automate(){
