@@ -1,7 +1,7 @@
 #pragma once
 #ifndef _MODBUS_CONTROLLER_H_
 #define _MODBUS_CONTROLLER_H_
-
+#define _CHAR_TIMEOUT_ 40
 
 #include <controller/panel_controller.h>
 
@@ -17,12 +17,35 @@ extern "C" {
 
 class ModbusController : public PanelController{
 private:
+    uint8_t counter = 0;     
     uint8_t  state = 0;
     uint64_t timer = 0;
     uint8_t readed = 0;
+    uint8_t bufferInput[64];
     
+
     request_modbus_pack_t * request = nullptr;
     
+    inline void pull(){
+        uint32_t tm = get_ms();
+        counter = 0;     
+        while(get_ms() - tm <= _CHAR_TIMEOUT_ && counter < sizeof(bufferInput)){  //testing 03 03 00 08 00 01 04 2A
+            if(Serial.available()){
+                tm = get_ms();
+                bufferInput[counter] = Serial.read();
+                counter++;
+            }
+        }        
+    }
+
+
+    inline void clearBufferInput(){
+        for (uint8_t i = 0; i < 64; i++)
+        {
+            bufferInput[i] = 0; 
+        }
+    }
+
     inline void init_uart(){
         Serial.begin(9600, SERIAL_8O1);
         while(! Serial);
@@ -91,27 +114,34 @@ public:
     inline void init_modbus(){
         init_requests();
         init_uart();
+
     }          
 
     void modbus_automate(){
         if(state == 0 && get_ms() - timer >= T240){ //send command t240 interval
-        
-            if(queue.isEmpty()){ 
-                // read command sensors
-
-                return; 
+            
+            if(! queue.isEmpty()){ 
+                request = requests[queue.pop()];
+                request->send();
+                state++;
             }
 
-            request = requests[queue.pop()];
-            request->send();
+            timer = get_ms();
         }
-        if(state){
-            //start reading
+        if( state == 1 && Serial.available() ){
+            pull();// read command sensors
         }
-        if( (state && get_ms - timer >= TIMEOUT ) || readed){
-            //stop reading
+        if( (state && get_ms() - timer >= TIMEOUT ) || (counter > 0 && state ) ){
+            uint8_t status = request->handle( bufferInput, counter);
+            state =0;
+            timer = get_ms();
+#if DEBUG_ENABLED
+            println(status);
+#endif 
+
         }
     }
+
 
 };
 #endif      
