@@ -10,7 +10,7 @@
 #define K         0.4                    //multiply component make link with potentiometers 
 #define DELTA     99                     //threashold to change value potentiometer,
 
-#define OVERLOAD  PD3                    // INT0 interrupt connected
+#define OVERLOAD  PD4                    // INT0 interrupt connected
 #define STOP      PD2                    // INT1 interrupt connected
 
 #define RIGHT     PD6                    // layer direction right button
