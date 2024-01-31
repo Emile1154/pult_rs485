@@ -83,7 +83,7 @@ public:
             winch_running = DOWN_STATE;
         }
         //if button STOP is pressed
-        if( ! (PIND & (1 << STOP)) || ! (PIND & (1 << OVERLOAD))){
+        if( (PIND & (1 << STOP)) || ! (PIND & (1 << OVERLOAD))){
             queue.push(STOP_ALL);
 #if DEBUG_ENABLED
             println("STOP pressed");
