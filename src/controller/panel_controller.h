@@ -136,7 +136,7 @@ public:
                     //set speed cmd and reverse cmd
                     requests[LAYER_STOP_SET_SPEED]->set_value(layer_pot_prev, 1);
                     queue.push(LAYER_STOP_SET_SPEED);
-                    requests[LAYER_REVERSE]->set_value(1,0);
+                    requests[LAYER_REVERSE]->set_value(2,0);
                     queue.push(LAYER_REVERSE);
                 }
 #if DEBUG_ENABLED
