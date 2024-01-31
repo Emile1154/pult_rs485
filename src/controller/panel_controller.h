@@ -52,9 +52,6 @@ private:
         DDRD &= ~(1 << STOP);           // Set STOP pin as input
 
         DDRD &= ~(1 << OVERLOAD);       // Set OVERLOAD pin as input
-        
-        DDRC &= ~(1 << ADC_REEL);       // Set ADC_REEL pin as input
-        DDRC &= ~(1 << ADC_LAYER);      // Set ADC_LAYER pin as input   
     }
 
 
@@ -72,42 +69,42 @@ public:
         //if button UP is pressed
         if( ! (PINC & (1 << UP)) &&  winch_running == STOP_STATE ){
             queue.push(START_ALL_CW);
-// #if DEBUG_ENABLED 
-//             println(("UP pressed"));
-// #endif
+#if DEBUG_ENABLED 
+            println("UP pressed");
+#endif
             winch_running = UP_STATE;
         }
         //if button DOWN is pressed
         if( ! (PINC & (1 << DOWN)) && winch_running == STOP_STATE ){
             queue.push(START_ALL_CCW);
-// #if DEBUG_ENABLED
-//             println(("DOWN pressed"));
-// #endif
+#if DEBUG_ENABLED
+            println("DOWN pressed");
+#endif
             winch_running = DOWN_STATE;
         }
         //if button STOP is pressed
-        if( ! (PIND & (1 << STOP)) ){
+        if( ! (PIND & (1 << STOP)) || ! (PIND & (1 << OVERLOAD))){
             queue.push(STOP_ALL);
-// #if DEBUG_ENABLED
-//             println(("STOP pressed"));
-// #endif
+#if DEBUG_ENABLED
+            println("STOP pressed");
+#endif
             winch_running = STOP_STATE;
         }
 
         if( ! (PINB & (1 << LEFT)) && layer_dir == STOP_STATE ){
             queue.push(LAYER_START_MAX_CCW);
-// #if DEBUG_ENABLED
-//             println(("LEFT pressed"));
-// #endif
+#if DEBUG_ENABLED
+            println("LEFT pressed");
+#endif
 
             layer_dir = LEFT_STATE;
 
         }
         if( ! (PIND & (1 << RIGHT)) && layer_dir == STOP_STATE ){
             queue.push(LAYER_START_MAX_CW);
-// #if DEBUG_ENABLED
-//             println(("RIGHT pressed"));
-// #endif
+#if DEBUG_ENABLED
+            println("RIGHT pressed");
+#endif
             layer_dir = RIGHT_STATE;
         }
 
@@ -116,24 +113,35 @@ public:
             if(winch_running == UP_STATE){
                 if(layer_dir == RIGHT_STATE){
                     //only set speed cmd
-
+                    requests[LAYER_SET_SPEED]->set_value(layer_pot_prev, 0);
+                    queue.push(LAYER_SET_SPEED);
                 }else{
                     // set speed cmd and reverse cmd
+                    requests[LAYER_STOP_SET_SPEED]->set_value(layer_pot_prev, 1);
+                    queue.push(LAYER_STOP_SET_SPEED);
+                    requests[LAYER_REVERSE]->set_value(1,0);
+                    queue.push(LAYER_REVERSE);
                 }
-                queue.push(LAYER_STOP_SET_SPEED);
-// #if DEBUG_ENABLED
-//                 println(("LEFT/RIGHT released & winch is run"));
-// #endif                 
+                
+#if DEBUG_ENABLED
+                println("LEFT/RIGHT released & winch is run");
+#endif                 
             }
             if(winch_running == DOWN_STATE){
                 if(layer_dir == LEFT_STATE){
                     // only set speed cmd
+                    requests[LAYER_SET_SPEED]->set_value(layer_pot_prev, 0);
+                    queue.push(LAYER_SET_SPEED);
                 }else{
                     //set speed cmd and reverse cmd
+                    requests[LAYER_STOP_SET_SPEED]->set_value(layer_pot_prev, 1);
+                    queue.push(LAYER_STOP_SET_SPEED);
+                    requests[LAYER_REVERSE]->set_value(1,0);
+                    queue.push(LAYER_REVERSE);
                 }
-// #if DEBUG_ENABLED
-//                 println(("LEFT/RIGHT released"));
-// #endif      
+#if DEBUG_ENABLED
+                println(("LEFT/RIGHT released"));
+#endif      
             }
             layer_dir = STOP_STATE;
         }
@@ -143,6 +151,9 @@ public:
         if( get_ms() - timer >= 10000){
             uint16_t reel_value = adc_read(0);
             uint16_t layer_value = adc_read(1) + K*reel_value;
+            if(layer_value >= 5000){
+                layer_value = 5000;
+            }
             if(abs(reel_value - reel_pot_prev) > DELTA){  // if values from potentiometr reel changed refresh freqency on slave devices
                 requests[REEL_SET_SPEED]->set_value( reel_value, 0 );
                 queue.push(REEL_SET_SPEED);
@@ -163,6 +174,4 @@ public:
         }
     }
 };
-
-
 #endif

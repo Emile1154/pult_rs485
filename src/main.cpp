@@ -9,5 +9,7 @@ int main() {
     while(1){
         panel.read_keypad();
         panel.read_potentiometer();
+
+        panel.modbus_automate();
     }
 }
