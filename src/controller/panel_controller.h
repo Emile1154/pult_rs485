@@ -72,42 +72,42 @@ public:
         //if button UP is pressed
         if( ! (PINC & (1 << UP)) &&  winch_running == STOP_STATE ){
             queue.push(START_ALL_CW);
-#if DEBUG_ENABLED 
-            println(("UP pressed"));
-#endif
+// #if DEBUG_ENABLED 
+//             println(("UP pressed"));
+// #endif
             winch_running = UP_STATE;
         }
         //if button DOWN is pressed
         if( ! (PINC & (1 << DOWN)) && winch_running == STOP_STATE ){
             queue.push(START_ALL_CCW);
-#if DEBUG_ENABLED
-            println(("DOWN pressed"));
-#endif
+// #if DEBUG_ENABLED
+//             println(("DOWN pressed"));
+// #endif
             winch_running = DOWN_STATE;
         }
         //if button STOP is pressed
         if( ! (PIND & (1 << STOP)) ){
             queue.push(STOP_ALL);
-#if DEBUG_ENABLED
-            println(("STOP pressed"));
-#endif
+// #if DEBUG_ENABLED
+//             println(("STOP pressed"));
+// #endif
             winch_running = STOP_STATE;
         }
 
         if( ! (PINB & (1 << LEFT)) && layer_dir == STOP_STATE ){
             queue.push(LAYER_START_MAX_CCW);
-#if DEBUG_ENABLED
-            println(("LEFT pressed"));
-#endif
+// #if DEBUG_ENABLED
+//             println(("LEFT pressed"));
+// #endif
 
             layer_dir = LEFT_STATE;
 
         }
         if( ! (PIND & (1 << RIGHT)) && layer_dir == STOP_STATE ){
             queue.push(LAYER_START_MAX_CW);
-#if DEBUG_ENABLED
-            println(("RIGHT pressed"));
-#endif
+// #if DEBUG_ENABLED
+//             println(("RIGHT pressed"));
+// #endif
             layer_dir = RIGHT_STATE;
         }
 
@@ -121,9 +121,9 @@ public:
                     // set speed cmd and reverse cmd
                 }
                 queue.push(LAYER_STOP_SET_SPEED);
-#if DEBUG_ENABLED
-                println(("LEFT/RIGHT released & winch is run"));
-#endif                 
+// #if DEBUG_ENABLED
+//                 println(("LEFT/RIGHT released & winch is run"));
+// #endif                 
             }
             if(winch_running == DOWN_STATE){
                 if(layer_dir == LEFT_STATE){
@@ -131,9 +131,9 @@ public:
                 }else{
                     //set speed cmd and reverse cmd
                 }
-#if DEBUG_ENABLED
-                println(("LEFT/RIGHT released"));
-#endif      
+// #if DEBUG_ENABLED
+//                 println(("LEFT/RIGHT released"));
+// #endif      
             }
             layer_dir = STOP_STATE;
         }
