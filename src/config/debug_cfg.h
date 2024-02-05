@@ -2,7 +2,7 @@
 #ifndef _DEBUG_CONTROLLER_H_
 #define _DEBUG_CONTROLLER_H_
 
-#if DEBUG_ENABLED
+
 
 #include <SoftwareSerial.h>
 SoftwareSerial debug(8,10);
@@ -29,7 +29,7 @@ void println(uint32_t val) {
 
 
 
-#endif
+
 
 
 

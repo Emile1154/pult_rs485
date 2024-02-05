@@ -5,7 +5,7 @@
 
 #include <controller/panel_controller.h>
 #include <stdint.h>
-#include <model/queue.h>
+
 extern "C" {
     #include <form/indicator.h>
 }
@@ -134,11 +134,16 @@ public:
     }          
 
     void modbus_automate(){
+       
         if(state == 0 && get_ms() - timer >= T240){ //send command t240 interval
-            if(! queue.isEmpty()){ 
-                cur_cmd = queue.pop();
+            if(! isempty()){ 
+                cur_cmd = pop();
                 requests[cur_cmd]->send();
                 state++;
+#if DEBUG_ENABLED  
+                print(cur_cmd);
+                println("cure");
+#endif                    
             }
             timer = get_ms();
         }
@@ -172,7 +177,7 @@ public:
                 }else{                          //STATUS ERROR 
                     // TRY SEND AGAIN 
                     if(try_again_cnt <= TRY_COUNT_MAX){
-                        queue.push(cur_cmd);
+                        push(cur_cmd);
                         try_again_cnt++;
                     }else{
                         error_view();   // LED UP AND LED DOWN ENABLE
@@ -202,6 +207,8 @@ public:
             state = 0;
             timer = get_ms();
         }
+        
     }
+
 };
 #endif      

@@ -58,6 +58,7 @@ typedef struct request_modbus_write_pack_t : request_modbus_pack_t
 {
     uint8_t value_hi;
     uint8_t value_lo;
+    uint8_t temp[6];
 
     void set_value(uint16_t value, uint8_t reg) override{
         value_hi = (value >> 8) & 0xFF;
@@ -90,7 +91,6 @@ typedef struct request_modbus_write_pack_t : request_modbus_pack_t
     }
 
     void update_crc16() override{
-        uint8_t * temp = (uint8_t*) malloc(6 * sizeof(uint8_t));
         temp[0] = id;
         temp[1] = fx;
         temp[2] = address_hi;
@@ -102,9 +102,6 @@ typedef struct request_modbus_write_pack_t : request_modbus_pack_t
 
         this->crc_hi = (crc >> 8) & 0xFF;
         this->crc_lo = crc & 0xFF;
-
-        free(temp);
-        temp = nullptr;
     }
 
     request_modbus_write_pack_t(
@@ -167,6 +164,8 @@ typedef struct request_modbus_group_write_pack_t : request_modbus_pack_t
     void send() override{
         Serial.write(id);
         Serial.write(fx);
+        Serial.write(address_hi);
+        Serial.write(address_lo);
         Serial.write(cnt_reg_hi);
         Serial.write(cnt_reg_lo);
         Serial.write(cnt_bytes);

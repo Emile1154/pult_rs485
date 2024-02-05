@@ -25,7 +25,7 @@
 /*============================MODBUS RTU SETTINGS===================================*/
 #define SPEED          9600              // baudrate               
 #define INTERVAL       120               // 12ms setup in CF
-#define T240           250               // wait for next send after get answer
+#define T240           500               // wait for next send after get answer
 #define MAX_TRY_COUNT  15                // max count send packet if have problem in sending
 #define TIMEOUT        3000              // timeout for reading 300 ms
 
@@ -45,7 +45,7 @@
 #define REEL_SET_SPEED        7
 #define LAYER_REVERSE         8
 
-#define MAX_REQUESTS          8          //max size for request_arr;  
+#define MAX_REQUESTS          9          //max size for request_arr;  
 #define MAX_SIZE_QUEUE        64         // queue request max size
 
 #endif
