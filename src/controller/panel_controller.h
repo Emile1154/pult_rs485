@@ -126,8 +126,8 @@ public:
                     push(LAYER_SET_SPEED);
                 }else{
                     // set speed cmd and reverse cmd
-                    //requests[LAYER_STOP_SET_SPEED]->set_value(layer_pot_prev, 1);
-                    //push(LAYER_STOP_SET_SPEED);
+                    requests[LAYER_STOP_SET_SPEED]->set_value(layer_pot_prev, 1);
+                    push(LAYER_STOP_SET_SPEED);
                     requests[LAYER_REVERSE]->set_value(1,0);
                     push(LAYER_REVERSE);
                     //layer_dir = RIGHT_STATE;
